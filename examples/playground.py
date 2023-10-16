@@ -1,5 +1,6 @@
 # Testing script, not intended for production use
 
+
 from sampling.models import HFModel
 from sampling.modifiers import TopK, TopP, Temperature, ForbiddenTokens
 from sampling.terminations import LengthTermination
@@ -19,14 +20,15 @@ terminations = [LengthTermination(200)]
 
 sampler = MultinomialSampler(hf_model, modifiers, terminations)
 
-import sys
-def callback(text):
-    print(text, end="")
-    sys.stdout.flush()
-
 start_text = "The quick brown fox"
 
-
 print(start_text, end="")
-sampler.generate(start_text, callback)
+outputs = sampler.generate(start_text)
+
+import sys
+for new_text in outputs:
+    print(new_text, end="")
+    sys.stdout.flush()
+
+print("")
 

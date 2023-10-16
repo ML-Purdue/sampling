@@ -13,14 +13,14 @@ class Sampler:
         self.modifiers = modifiers
         self.terminations = terminations
 
-    def generate(self, text: str, callback: Callable[[str], None]):
+    def generate(self, text: str):
         raise NotImplementedError()
 
 class MultinomialSampler(Sampler):
     def __init__(self, model: Model, modifiers: list[Modifier], terminations: list[Termination]):
         super().__init__(model, modifiers, terminations)
 
-    def generate(self, text: str, callback: Callable[[str], None]):
+    def generate(self, text: str):
         tokens = self.model.encode(text)
         while not any(termination.terminate(tokens) for termination in self.terminations):
             dist = self.model(tokens)
@@ -37,4 +37,4 @@ class MultinomialSampler(Sampler):
 
             new_text = self.model.decode(tokens)[original_length:]
 
-            callback(new_text)
+            yield new_text
