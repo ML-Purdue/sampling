@@ -2,7 +2,7 @@
 name = "llm-sampling"
 version = "0.1.0"
 description = ""
-authors = ["Your Name <you@example.com>"]
+authors = ["Sagar Patil <sagarreddypatil@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
