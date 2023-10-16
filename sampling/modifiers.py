@@ -18,6 +18,15 @@ class Temperature(Modifier):
     def __call__(self, dist: Distribution) -> Distribution:
         dist.logits /= self.temperature
         return dist
+    
+class ForbiddenTokens(Modifier):
+    def __init__(self, forbidden_tokens: list[int]):
+        super().__init__()
+        self.forbidden_tokens = torch.Tensor(forbidden_tokens).long()
+
+    def __call__(self, dist: Distribution) -> Distribution:
+        dist.logits[..., self.forbidden_tokens] = -float('Inf')
+        return dist
 
 
 # Top K and Top P derived from https://huggingface.co/transformers/v3.2.0/_modules/transformers/generation_utils.html
