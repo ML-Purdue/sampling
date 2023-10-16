@@ -31,6 +31,10 @@ class MultinomialSampler(Sampler):
             multi = Categorical(probs=dist.probs[-1:,:])
             next_token = multi.sample()
 
+            original_length = len(self.model.decode(tokens))
+
             tokens = torch.cat((tokens, next_token), dim=-1)
-            text = self.model.decode(tokens)
-            callback(text)
+
+            new_text = self.model.decode(tokens)[original_length:]
+
+            callback(new_text)

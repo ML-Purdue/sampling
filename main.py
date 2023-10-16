@@ -11,13 +11,18 @@ model = AutoModelForCausalLM.from_pretrained('distilgpt2')
 tokenizer = AutoTokenizer.from_pretrained('distilgpt2')
 
 hf_model = HFModel(model, tokenizer)
-modifiers = [Temperature(0.9)]
+modifiers = [Temperature(1.0), TopP(0.9)]
 terminations = [LengthTermination(200)]
 
 sampler = MultinomialSampler(hf_model, modifiers, terminations)
 
+import sys
 def callback(text):
-    print(text)
+    print(text, end="")
+    sys.stdout.flush()
 
-sampler.generate("Hello! How", callback)
+start_text = "The quick brown fox"
+
+print(start_text, end="")
+sampler.generate(start_text, callback)
 
