@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "llm-sampling"
+name = "sampling"
 version = "0.1.0"
 description = ""
 authors = ["Sagar Patil <sagarreddypatil@gmail.com>"]
