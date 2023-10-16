@@ -1,3 +1,6 @@
+import torch
+from .. import Distribution
+
 class Model:
     def __init__(self):
         pass
@@ -5,5 +8,8 @@ class Model:
     def __call__(self, input_ids: torch.Tensor) -> Distribution:
         raise NotImplementedError()
     
-    def decode(self, input_ids: torch.Tensor) -> str:
+    def encode(self, text: str) -> torch.Tensor:
+        raise NotImplementedError()
+
+    def decode(self, tokens: torch.Tensor) -> str:
         raise NotImplementedError()

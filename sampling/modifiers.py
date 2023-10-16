@@ -1,12 +1,23 @@
+from sampling import Distribution
 from . import Distribution
 import torch
+import torch.nn.functional as F
 
 class Modifier:
     def __init__(self):
         pass
 
-    def __call__(self, dist: Distribution):
+    def __call__(self, dist: Distribution) -> Distribution:
         raise NotImplementedError()
+    
+class Temperature(Modifier):
+    def __init__(self, temperature: float):
+        super().__init__()
+        self.temperature = temperature
+    
+    def __call__(self, dist: Distribution) -> Distribution:
+        dist.logits /= self.temperature
+        return dist
 
 
 # Top K and Top P derived from https://huggingface.co/transformers/v3.2.0/_modules/transformers/generation_utils.html
@@ -35,9 +46,11 @@ class TopK(Modifier):
 
         self.k = k
 
-    def __call__(self, dist: Distribution):
-        indices_to_remove = scores < torch.topk(dist.logits, self.k)[0][..., -1, None]
-        dist.logits = scores.masked_fill(indices_to_remove, -float('Inf'))
+    def __call__(self, dist: Distribution) -> Distribution:
+        indices_to_remove = dist.logits < torch.topk(dist.logits, self.k)[0][..., -1, None]
+        dist.logits = dist.logits.masked_fill(indices_to_remove, -float('Inf'))
+
+        return dist
 
 
 
@@ -46,7 +59,9 @@ class TopP(Modifier):
         super().__init__()
         self.p = p
 
-    def __call__(self, dist: Distribution):
+    def __call__(self, dist: Distribution) -> Distribution:
+        min_tokens_to_keep = 1 # TOOD: make this configurable?
+
         if self.p >= 1.0:
             return dist
 

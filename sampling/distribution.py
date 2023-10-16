@@ -1,5 +1,5 @@
 import torch
-import torch.functoinal as F
+import torch.nn.functional as F
 
 class Distribution:
     def __init__(self, logits: torch.Tensor):
