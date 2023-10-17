@@ -28,7 +28,7 @@ class MultinomialSampler(Sampler):
             for modifier in self.modifiers:
                 dist = modifier(dist)
 
-            multi = Categorical(probs=dist.probs[-1:,:])
+            multi = Categorical(logits=dist.logits[-1:,:])
             next_token = multi.sample()
 
             original_length = len(self.model.decode(tokens))

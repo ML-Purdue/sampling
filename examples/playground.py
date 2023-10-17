@@ -15,20 +15,25 @@ hf_model = HFModel(model, tokenizer)
 
 forbidden_tokens = [hf_model.encode("<|endoftext|>")[0]]
 
-modifiers = [ForbiddenTokens(forbidden_tokens), Temperature(1.0), TopP(0.9)]
-terminations = [LengthTermination(200)]
+modifiers = [ForbiddenTokens(forbidden_tokens), Temperature(0.9)]
+terminations = [LengthTermination(150)]
 
 sampler = MultinomialSampler(hf_model, modifiers, terminations)
 
-start_text = "The quick brown fox"
+start_text = "The answer to life, the universe, and everything is"
 
-print(start_text, end="")
-outputs = sampler.generate(start_text)
+def main():
+    print(start_text, end="")
+    outputs = sampler.generate(start_text)
 
-import sys
-for new_text in outputs:
-    print(new_text, end="")
-    sys.stdout.flush()
+    import sys
+    for new_text in outputs:
+        print(new_text, end="")
+        sys.stdout.flush()
 
-print("")
+    print("")
 
+
+main()
+# import cProfile
+# cProfile.run('main()', sort='cumtime')
