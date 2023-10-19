@@ -1,9 +1,9 @@
 from .models import Model
 from .modifiers import Modifier
 from .terminations import Termination
+import gc
 
 import torch
-from torch.distributions.categorical import Categorical
 
 from typing import Callable
 
@@ -22,14 +22,14 @@ class MultinomialSampler(Sampler):
 
     def generate(self, text: str):
         tokens = self.model.encode(text)
+
         while not any(termination.terminate(tokens) for termination in self.terminations):
             dist = self.model(tokens)
 
             for modifier in self.modifiers:
                 dist = modifier(dist)
 
-            multi = Categorical(logits=dist.logits[-1:,:])
-            next_token = multi.sample()
+            next_token = torch.multinomial(dist.probs, num_samples=1)
 
             original_length = len(self.model.decode(tokens))
 
@@ -38,3 +38,5 @@ class MultinomialSampler(Sampler):
             new_text = self.model.decode(tokens)[original_length:]
 
             yield new_text
+
+            gc.collect()
