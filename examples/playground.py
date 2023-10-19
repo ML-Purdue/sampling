@@ -6,8 +6,8 @@ from sampling.samplers import MultinomialSampler
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 
-# device = "cuda" if torch.cuda.is_available() else "cpu"
-device = "cpu"
+device = "cuda" if torch.cuda.is_available() else "cpu"
+# device = "cpu"
 
 # model = AutoModelForCausalLM.from_pretrained('mistralai/Mistral-7B-v0.1').to(device)
 # tokenizer = AutoTokenizer.from_pretrained('mistralai/Mistral-7B-v0.1')
@@ -18,12 +18,12 @@ tokenizer = AutoTokenizer.from_pretrained('facebook/opt-125m')
 hf_model = HFModel(model, tokenizer, device)
 
 # forbidden_tokens = [hf_model.encode("<|endoftext|>")[0]]
-# forbidden_tokens = [hf_model.encode("</s>")[0]]
-forbidden_tokens = []
+forbidden_tokens = [hf_model.encode("</s>")[0]]
+# forbidden_tokens = []
 
-# modifiers = [ForbiddenTokens(forbidden_tokens), Temperature(0.9)]
-modifiers = []
-terminations = [LengthTermination(50)]
+modifiers = [ForbiddenTokens(forbidden_tokens)]
+# modifiers = []
+terminations = [LengthTermination(1000)]
 # terminations = []
 
 sampler = MultinomialSampler(hf_model, modifiers, terminations)
@@ -41,4 +41,11 @@ def main():
 
     print("")
 
+def main_hf():
+    model_inputs = tokenizer([start_text], return_tensors="pt").to(device)
+    new_ids = model.generate(**model_inputs, max_new_tokens=1000, min_length=800, do_sample=True)
+    print("".join(tokenizer.batch_decode(new_ids[0])))
+
 main()
+print("---------------------------")
+# main_hf()

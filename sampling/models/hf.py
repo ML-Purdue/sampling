@@ -10,8 +10,8 @@ class HFModel:
         self.device = device if device else "cpu"
 
     def __call__(self, input_ids: torch.Tensor, **kwargs) -> Distribution:
-        logits = self.model(input_ids.unsqueeze(0).to(self.device), **kwargs).logits.cpu().detach()[0,-1,:]
-
+        logits = self.model(input_ids.unsqueeze(0)).logits[0,-1,:]
+        del input_ids
         return Distribution(logits=logits)
 
     def encode(self, text: str) -> torch.Tensor:

@@ -1,7 +1,6 @@
 from .models import Model
 from .modifiers import Modifier
 from .terminations import Termination
-import gc
 
 import torch
 
@@ -21,7 +20,7 @@ class MultinomialSampler(Sampler):
         super().__init__(model, modifiers, terminations)
 
     def generate(self, text: str):
-        tokens = self.model.encode(text)
+        tokens = self.model.encode(text).to(self.model.device)
 
         while not any(termination.terminate(tokens) for termination in self.terminations):
             dist = self.model(tokens)
@@ -29,14 +28,16 @@ class MultinomialSampler(Sampler):
             for modifier in self.modifiers:
                 dist = modifier(dist)
 
-            next_token = torch.multinomial(dist.probs, num_samples=1)
+            next_token = torch.multinomial(dist.probs.detach(), num_samples=1)
+
+            del dist
 
             original_length = len(self.model.decode(tokens))
 
-            tokens = torch.cat((tokens, next_token), dim=-1)
+            tokens = torch.cat([tokens, next_token], dim=-1)
+
+            del next_token
 
             new_text = self.model.decode(tokens)[original_length:]
 
             yield new_text
-
-            gc.collect()
