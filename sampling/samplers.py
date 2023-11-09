@@ -5,7 +5,7 @@ from .terminations import Termination
 import torch
 
 from typing import Callable
-
+import gc
 class Sampler:
     def __init__(self, model: Model, modifiers: list[Modifier], terminations: list[Termination]):
         self.model = model
@@ -21,7 +21,7 @@ class MultinomialSampler(Sampler):
 
     def generate(self, text: str):
         tokens = self.model.encode(text).to(self.model.device)
-
+        
         while not any(termination.terminate(tokens) for termination in self.terminations):
             dist = self.model(tokens)
 
@@ -39,5 +39,7 @@ class MultinomialSampler(Sampler):
             del next_token
 
             new_text = self.model.decode(tokens)[original_length:]
+            
+            del original_length
 
             yield new_text
