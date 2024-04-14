@@ -16,12 +16,12 @@ hf_model = HFModel(model, tokenizer)
 # forbidden_tokens = [hf_model.encode("<|endoftext|>")[0]]
 forbidden_tokens = [hf_model.encode("</s>")[0]]
 
-modifiers = [ForbiddenTokens(forbidden_tokens), Temperature(1.1)]
+modifiers = [ForbiddenTokens(forbidden_tokens), TopK(20), Temperature(0.9)]
 terminations = [LengthTermination(200)]
 
 sampler = MultinomialSampler(hf_model, modifiers, terminations)
 
-start_text = "The quick brown fox jumps over the lazy dog."
+start_text = "The quick brown fox jumps over the"
 
 def main():
     print(start_text, end="")
