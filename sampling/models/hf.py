@@ -4,12 +4,14 @@ import transformers
 from .. import Distribution
 
 class HFModel:
-    def __init__(self, model: transformers.PreTrainedModel, tokenizer: transformers.PreTrainedTokenizer):
+    def __init__(self, model: transformers.PreTrainedModel, tokenizer: transformers.PreTrainedTokenizer, device=None):
         self.model = model
         self.tokenizer = tokenizer
+        self.device = device if device else "cpu"
 
     def __call__(self, input_ids: torch.Tensor, **kwargs) -> Distribution:
-        logits = self.model(input_ids.unsqueeze(0), **kwargs).logits[0]
+        logits = self.model(input_ids.unsqueeze(0)).logits[0,-1,:]
+        del input_ids
         return Distribution(logits=logits)
 
     def encode(self, text: str) -> torch.Tensor:
